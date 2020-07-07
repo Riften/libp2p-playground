@@ -43,6 +43,8 @@ func (n *Node) Start() {
 			}
 		}
 	}()
+	
+	select{}
 }
 
 func (n *Node) IsConnect(pid peer.ID) bool {
