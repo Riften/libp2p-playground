@@ -35,7 +35,7 @@ func (n *Node) Start() {
 				if !n.IsConnect(p.ID) {
 					err := n.host.Connect(n.ctx, p)
 					if err != nil {
-						fmt.Println("Error when connect ", p.ID.Pretty(), ": ", err)
+						//fmt.Println("Error when connect ", p.ID.Pretty(), ": ", err)
 					} else {
 						fmt.Println("Connect ", p.ID.Pretty())
 					}
@@ -43,7 +43,7 @@ func (n *Node) Start() {
 			}
 		}
 	}()
-	
+
 	select{}
 }
 

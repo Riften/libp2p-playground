@@ -7,13 +7,13 @@ import (
 	secio "github.com/libp2p/go-libp2p-secio"
 	tls "github.com/libp2p/go-libp2p-tls"
 	"github.com/Riften/libp2p-playground/repo"
+	"github.com/multiformats/go-multiaddr"
 )
 
 // option() build the libp2p options
 // options include:
 //		- private key, used to set the host identity
 //		- protector, used to run host in private network
-//		- security, used to set the security protocol used by connections
 func option(cfg *repo.Config) ([]libp2p.Option, error){
 	var privKey crypto.PrivKey
 	var err error
@@ -29,10 +29,9 @@ func option(cfg *repo.Config) ([]libp2p.Option, error){
 		}
 	}
 
-
 	// set security protocol
-	opts = append(opts, libp2p.ChainOptions(libp2p.Security(secio.ID, secio.New), libp2p.Security(tls.ID, tls.New)))
-
-	opts = append(opts, libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/40102"))
+	// opts = append(opts, libp2p.ChainOptions(libp2p.Security(secio.ID, secio.New), libp2p.Security(tls.ID, tls.New)))
+	sourceMultiAddr, _ := multiaddr.NewMultiaddr("/ip4/0.0.0.0/tcp/40102")
+	opts = append(opts, libp2p.ListenAddrs(sourceMultiAddr))
 	return opts, nil
 }
