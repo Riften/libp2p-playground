@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p-core/crypto"
-	secio "github.com/libp2p/go-libp2p-secio"
-	tls "github.com/libp2p/go-libp2p-tls"
+	//secio "github.com/libp2p/go-libp2p-secio"
+	//tls "github.com/libp2p/go-libp2p-tls"
 	"github.com/Riften/libp2p-playground/repo"
 	"github.com/multiformats/go-multiaddr"
 )
