@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"main/cmd"
+	"github.com/Riften/libp2p-playground/cmd"
 )
 
 func main() {
