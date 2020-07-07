@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/libp2p/go-libp2p"
 	p2phost "github.com/libp2p/go-libp2p-core/host"
-	"main/repo"
+	"github.com/Riften/libp2p-playground/repo"
 )
 
 func newHost(ctx context.Context,  cfg *repo.Config) (p2phost.Host, error){

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	p2phost "github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/peer"
-	"main/repo"
+	"github.com/Riften/libp2p-playground/repo"
 	"time"
 )
 

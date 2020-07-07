@@ -6,7 +6,7 @@ import (
 	"github.com/libp2p/go-libp2p-core/crypto"
 	secio "github.com/libp2p/go-libp2p-secio"
 	tls "github.com/libp2p/go-libp2p-tls"
-	"main/repo"
+	"github.com/Riften/libp2p-playground/repo"
 )
 
 // option() build the libp2p options

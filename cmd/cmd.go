@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"main/host"
-	"main/repo"
+	"github.com/Riften/libp2p-playground/host"
+	"github.com/Riften/libp2p-playground/repo"
 	"os"
 )
 
