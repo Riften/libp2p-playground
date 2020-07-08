@@ -32,7 +32,7 @@ func SendRequest(path string, values map[string]string, port int) error{
 		fmt.Println(err.Error())
 		return err
 	}
-	buf := make([]byte, 1000)
+	buf := make([]byte, 100)
 	for {
 		readSize, err := resp.Body.Read(buf)
 		fmt.Print(string(buf[:readSize]))
