@@ -26,7 +26,7 @@ func SendRequest(path string, values map[string]string, port int) error{
 
 	client := &http.Client{}
 	r, _ := http.NewRequest("POST", urlStr, strings.NewReader(data.Encode()))
-	r.Header.Add("Content-Type", "application/libp2p-playground")
+	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := client.Do(r)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -37,6 +37,7 @@ func SendRequest(path string, values map[string]string, port int) error{
 		readSize, err := resp.Body.Read(buf)
 		fmt.Print(string(buf[:readSize]))
 		if err == io.EOF {
+			//fmt.Println("== eof ==")
 			break
 		} else if err != nil {
 			fmt.Println("Error when read from response body: ", err)
