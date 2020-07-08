@@ -34,10 +34,9 @@ func SendRequest(path string, values map[string]string, port int) error{
 	}
 	buf := make([]byte, 1000)
 	for {
-		_, err := resp.Body.Read(buf)
-		fmt.Print(buf)
+		readSize, err := resp.Body.Read(buf)
+		fmt.Print(string(buf[:readSize]))
 		if err == io.EOF {
-			fmt.Println("== eof ==")
 			break
 		} else if err != nil {
 			fmt.Println("Error when read from response body: ", err)
