@@ -25,4 +25,6 @@ func (a *Api) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for k, v := range values {
 		fmt.Println("\t", "key:", k, ", value:", v[0])
 	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte{11111342342345})
 }
