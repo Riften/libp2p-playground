@@ -44,7 +44,7 @@ func (n *Node) Start() {
 		}
 	}()
 
-	select{}
+	<-context.Background().Done()
 }
 
 func (n *Node) IsConnect(pid peer.ID) bool {
