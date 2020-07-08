@@ -32,12 +32,12 @@ func SendRequest(path string, values map[string]string, port int) error{
 		fmt.Println(err.Error())
 		return err
 	}
-	buf := make([]byte, 100)
+	buf := make([]byte, 1000)
 	for {
 		readSize, err := resp.Body.Read(buf)
 		fmt.Print(string(buf[:readSize]))
 		if err == io.EOF {
-			//fmt.Println("== eof ==")
+			fmt.Println("== eof ==")
 			break
 		} else if err != nil {
 			fmt.Println("Error when read from response body: ", err)
