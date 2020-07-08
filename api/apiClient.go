@@ -26,7 +26,7 @@ func SendRequest(path string, values map[string]string, port int) error{
 
 	client := &http.Client{}
 	r, _ := http.NewRequest("POST", urlStr, strings.NewReader(data.Encode()))
-
+	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := client.Do(r)
 	if err != nil {
 		fmt.Println(err.Error())
