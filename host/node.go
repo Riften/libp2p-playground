@@ -28,6 +28,7 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 }
 
 func (n *Node) Start() {
+	//n.host.SetStreamHandler()
 	foundPeers := n.initMDNS()
 	go func() {
 		for{
