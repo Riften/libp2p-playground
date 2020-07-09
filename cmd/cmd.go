@@ -92,6 +92,13 @@ func Run() error {
 		return api.SendRequest("expr", map[string]string{"a": "a1"}, *appApiPort)
 	}
 
+	exprChatCmd := exprCmd.Command("chat", "Chat through mdns")
+	exprChatPort := exprChatCmd.Arg("port", "Port for host.").Default("4001").Int()
+	cmds[exprChatCmd.FullCommand()] = func() error {
+		host.ChatMDNS(*exprChatPort)
+		return nil
+	}
+
 	cmd := kingpin.MustParse(appCmd.Parse(os.Args[1:]))
 	for key, value := range cmds {
 		if key == cmd {
