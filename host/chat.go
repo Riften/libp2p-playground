@@ -125,7 +125,7 @@ func ChatMDNS(port int) {
 
 	fmt.Printf("\n[*] Your Multiaddress Is: /ip4/0.0.0.0/tcp/%v/p2p/%s\n", port, host.ID().Pretty())
 
-	peerChan := initMDNS(ctx, host, cfg.RendezvousString)
+	peerChan := initMDNS(ctx, host, rendezvous)
 
 	peer := <-peerChan // will block untill we discover a peer
 	fmt.Println("Found peer:", peer, ", connecting")
@@ -135,7 +135,7 @@ func ChatMDNS(port int) {
 	}
 
 	// open a stream, this stream will be handled by handleStream other end
-	stream, err := host.NewStream(ctx, peer.ID, protocol.ID(cfg.ProtocolID))
+	stream, err := host.NewStream(ctx, peer.ID, protocol.ID(chatProtocol))
 
 	if err != nil {
 		fmt.Println("Stream open failed", err)
