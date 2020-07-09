@@ -57,7 +57,7 @@ func Start(port int) {
 	go func() {
 		for{
 			p:= <-foundPeers
-			err := n.host.Connect(n.ctx, p)
+			err := host.Connect(ctx, p)
 			if err != nil {
 				fmt.Println("Error when connect ", p.ID.Pretty(), ": ", err)
 			} else {
