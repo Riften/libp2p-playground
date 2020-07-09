@@ -121,7 +121,7 @@ func ChatMDNS(port int) {
 
 	// Set a function as stream handler.
 	// This function is called when a peer initiates a connection and starts a stream with this peer.
-	//host.SetStreamHandler(protocol.ID(chatProtocol), handleStream)
+	host.SetStreamHandler(protocol.ID(chatProtocol), handleStream)
 
 	fmt.Printf("\n[*] Your Multiaddress Is: /ip4/0.0.0.0/tcp/%v/p2p/%s\n", port, host.ID().Pretty())
 

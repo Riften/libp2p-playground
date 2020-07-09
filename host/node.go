@@ -18,11 +18,7 @@ type Node struct {
 }
 
 func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
-	h, err := newHost(ctx, cfg)
-	if err != nil {
-		fmt.Println("Error when create host: ", err)
-		return nil, err
-	}
+	h := newHost(cfg.Port)
 	fmt.Printf("Host start at multiaddress: /ip4/0.0.0.0/tcp/%d/p2p/%s\n", cfg.Port, h.ID().Pretty())
 	return &Node{host: h, cfg: cfg, ctx: ctx}, nil
 }
