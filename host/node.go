@@ -27,31 +27,34 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 	return &Node{host: h, cfg: cfg, ctx: ctx}, nil
 }
 
-func Start(port int) {
+func (n *Node)Start(port int) {
 	//n.host.SetStreamHandler()
 	ctx := context.Background()
-	r := rand.Reader
+	//r := rand.Reader
 
 	// Creates a new RSA key pair for this host.
-	prvKey, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
-	if err != nil {
-		panic(err)
-	}
+	//prvKey, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	// 0.0.0.0 will listen on any interface device.
-	sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", port))
+	//sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", port))
 
 	// libp2p.New constructs a new libp2p Host.
 	// Other options can be added here.
+	/*
 	host, err := libp2p.New(
 		ctx,
 		libp2p.ListenAddrs(sourceMultiAddr),
 		libp2p.Identity(prvKey),
 	)
+	 */
+	host := n.host
 
-	if err != nil {
-		panic(err)
-	}
+	//if err != nil {
+		//panic(err)
+	//}
 
 	foundPeers := initMDNS(ctx, host, rendezvous)
 	go func() {
