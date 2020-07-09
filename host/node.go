@@ -2,10 +2,14 @@ package host
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"github.com/Riften/libp2p-playground/repo"
+	"github.com/libp2p/go-libp2p"
 	p2phost "github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/peer"
+	crypto "github.com/libp2p/go-libp2p-core/crypto"
+	"github.com/multiformats/go-multiaddr"
 	"time"
 )
 
@@ -18,7 +22,26 @@ type Node struct {
 }
 
 func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
-	h := newHost(cfg.Port)
+	//h := newHost(cfg.Port)
+	r := rand.Reader
+
+	// Creates a new RSA key pair for this host.
+	prvKey, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
+	if err != nil {
+		panic(err)
+	}
+
+	// 0.0.0.0 will listen on any interface device.
+	sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", cfg.Port))
+
+	// libp2p.New constructs a new libp2p Host.
+	// Other options can be added here.
+
+		h, err := libp2p.New(
+			ctx,
+			libp2p.ListenAddrs(sourceMultiAddr),
+			libp2p.Identity(prvKey),
+		)
 	fmt.Printf("Host start at multiaddress: /ip4/0.0.0.0/tcp/%d/p2p/%s\n", cfg.Port, h.ID().Pretty())
 	return &Node{host: h, cfg: cfg, ctx: ctx}, nil
 }
