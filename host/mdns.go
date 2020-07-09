@@ -18,7 +18,7 @@ func (n *discoveryNotifee) HandlePeerFound(pi peer.AddrInfo) {
 }
 
 //Initialize the MDNS service
-func (n *Node)initMDNS() chan peer.AddrInfo {
+func (n *Node) initMDNS() chan peer.AddrInfo {
 	//ser, err := discovery.NewMdnsService(n.ctx, n.host, 10* time.Second, discovery.ServiceTag)
 	ser, err := discovery.NewMdnsService(n.ctx, n.host, 10* time.Second, rendezvous)
 	if err != nil {

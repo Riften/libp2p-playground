@@ -1,13 +1,11 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"github.com/Riften/libp2p-playground/api"
 	"github.com/Riften/libp2p-playground/host"
 	"github.com/Riften/libp2p-playground/repo"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"net/http"
 	"os"
 )
 
@@ -67,6 +65,7 @@ func Run() error {
 			return err
 		}
 		cfg.Port = *startPort
+		/*
 		node, err := host.NewNode(context.Background(), cfg)
 		if err != nil {
 			fmt.Println("Error when create node: ", err)
@@ -81,7 +80,9 @@ func Run() error {
 		if err != nil {
 			fmt.Printf("Failed to start api server: %v\n", err)
 		}
-		node.Start()
+		*/
+		node := new(host.Node)
+		node.Start(*startPort)
 
 		return nil
 	}

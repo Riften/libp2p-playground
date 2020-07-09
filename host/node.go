@@ -2,10 +2,14 @@ package host
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
+	"github.com/libp2p/go-libp2p"
+	"github.com/libp2p/go-libp2p-core/crypto"
 	p2phost "github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/Riften/libp2p-playground/repo"
+	"github.com/multiformats/go-multiaddr"
 	"time"
 )
 
@@ -23,9 +27,33 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 	return &Node{host: h, cfg: cfg, ctx: ctx}, nil
 }
 
-func (n *Node) Start() {
+func (n *Node) Start(port int) {
 	//n.host.SetStreamHandler()
-	foundPeers := n.initMDNS()
+	ctx := context.Background()
+	r := rand.Reader
+
+	// Creates a new RSA key pair for this host.
+	prvKey, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
+	if err != nil {
+		panic(err)
+	}
+
+	// 0.0.0.0 will listen on any interface device.
+	sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", port))
+
+	// libp2p.New constructs a new libp2p Host.
+	// Other options can be added here.
+	host, err := libp2p.New(
+		ctx,
+		libp2p.ListenAddrs(sourceMultiAddr),
+		libp2p.Identity(prvKey),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	foundPeers := initMDNS(ctx, host, rendezvous)
 	go func() {
 		for{
 			p:= <-foundPeers
