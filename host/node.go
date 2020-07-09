@@ -27,7 +27,7 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 	return &Node{host: h, cfg: cfg, ctx: ctx}, nil
 }
 
-func (n *Node) Start(port int) {
+func Start(port int) {
 	//n.host.SetStreamHandler()
 	ctx := context.Background()
 	r := rand.Reader

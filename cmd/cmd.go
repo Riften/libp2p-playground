@@ -81,8 +81,8 @@ func Run() error {
 			fmt.Printf("Failed to start api server: %v\n", err)
 		}
 		*/
-		node := new(host.Node)
-		node.Start(*startPort)
+		//node := new(host.Node)
+		host.Start(*startPort)
 
 		return nil
 	}
