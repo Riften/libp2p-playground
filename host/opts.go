@@ -31,7 +31,7 @@ func option(cfg *repo.Config) ([]libp2p.Option, error){
 
 	// set security protocol
 	// opts = append(opts, libp2p.ChainOptions(libp2p.Security(secio.ID, secio.New), libp2p.Security(tls.ID, tls.New)))
-	sourceMultiAddr, _ := multiaddr.NewMultiaddr("/ip4/0.0.0.0/tcp/40102")
+	sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", cfg.Port))
 	opts = append(opts, libp2p.ListenAddrs(sourceMultiAddr))
 	return opts, nil
 }

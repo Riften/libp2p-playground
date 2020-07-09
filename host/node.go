@@ -23,6 +23,7 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 		fmt.Println("Error when create host: ", err)
 		return nil, err
 	}
+	fmt.Printf("Host start at multiaddress: /ip4/0.0.0.0/tcp/%d/p2p/%s\n", cfg.Port, h.ID().Pretty())
 	return &Node{host: h, cfg: cfg, ctx: ctx}, nil
 }
 

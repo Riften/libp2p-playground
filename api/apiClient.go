@@ -45,7 +45,7 @@ func SendRequest(path string, values map[string]string, port int) error{
 	}
 	fmt.Println("")
 
-	//defer resp.Body.Close()
+	defer resp.Body.Close()
 
 	return nil
 }

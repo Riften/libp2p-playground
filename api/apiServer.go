@@ -25,12 +25,27 @@ func (a *Api) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for k, v := range values {
 		fmt.Println("\t", "key:", k, ", value:", v[0])
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("aaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccddddddddddddddddddddddddddeeeeeeeeeeeeeeeeeeeeeeeeeffffffffffffffffffffffffffggggggggggggggggggggggggggggggghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkk" +
-		"llllllllllllllllllllllmmmmmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnnnnoooooooooooooooooooooppppppppppppppppqqqqqqqqqqqqqqqqqrrrrrrrrrrrrrrrrrsssssssssssssssssssstttttttttttttttttuuuuuuuuuuuuuuuuuvvvvvvvvvvvvvvvvvvvvvvwwwwwwwwwwww"))
+
+	switch r.URL.Path {
+	case "/expr":
+		responseString(w, "test")
+	case "/listPeer":
+		a.ListPeers(w)
+	}
+	//w.WriteHeader(http.StatusOK)
+	//w.Write([]byte("aaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccddddddddddddddddddddddddddeeeeeeeeeeeeeeeeeeeeeeeeeffffffffffffffffffffffffffggggggggggggggggggggggggggggggghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkk" +
+	//	"llllllllllllllllllllllmmmmmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnnnnoooooooooooooooooooooppppppppppppppppqqqqqqqqqqqqqqqqqrrrrrrrrrrrrrrrrrsssssssssssssssssssstttttttttttttttttuuuuuuuuuuuuuuuuuvvvvvvvvvvvvvvvvvvvvvvwwwwwwwwwwww"))
 
 	//<-context.Background().Done()
-	fmt.Println("Server end")
+	//fmt.Println("Server end")
+}
+
+func responseString(w http.ResponseWriter, str string) {
+	w.WriteHeader(http.StatusOK)
+	_, err := w.Write([]byte(str))
+	if err != nil {
+		fmt.Println("Error when write to http response: ", err)
+	}
 }
 
 func (a *Api) ListPeers(w http.ResponseWriter) {
@@ -40,6 +55,6 @@ func (a *Api) ListPeers(w http.ResponseWriter) {
 		if err != nil {
 			fmt.Println("Error when write response to")
 		}
-
 	}
+	w.WriteHeader(http.StatusOK)
 }
