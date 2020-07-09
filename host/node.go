@@ -2,14 +2,10 @@ package host
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
-	"github.com/libp2p/go-libp2p"
-	"github.com/libp2p/go-libp2p-core/crypto"
+	"github.com/Riften/libp2p-playground/repo"
 	p2phost "github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/peer"
-	"github.com/Riften/libp2p-playground/repo"
-	"github.com/multiformats/go-multiaddr"
 	"time"
 )
 
