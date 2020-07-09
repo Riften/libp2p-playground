@@ -31,16 +31,12 @@ func (n *Node) Start() {
 	foundPeers := n.initMDNS()
 	go func() {
 		for{
-			select {
-			case p:= <-foundPeers:
-				if !n.IsConnect(p.ID) {
-					err := n.host.Connect(n.ctx, p)
-					if err != nil {
-						//fmt.Println("Error when connect ", p.ID.Pretty(), ": ", err)
-					} else {
-						fmt.Println("Connect ", p.ID.Pretty())
-					}
-				}
+			p:= <-foundPeers
+			err := n.host.Connect(n.ctx, p)
+			if err != nil {
+				fmt.Println("Error when connect ", p.ID.Pretty(), ": ", err)
+			} else {
+				fmt.Println("Connect ", p.ID.Pretty())
 			}
 		}
 	}()
