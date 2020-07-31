@@ -1,25 +1,36 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"github.com/Riften/libp2p-playground/api"
 	"github.com/Riften/libp2p-playground/host"
 	"github.com/Riften/libp2p-playground/repo"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"io"
 	"os"
 )
 
 const defaultApiPort = "7891"
-var a *api.Api
+
+type method string // e.g. http.MethodGet
+
+type params struct {
+	args    []string
+	opts    map[string]string
+	payload io.Reader
+	ctype   string
+}
 
 type cmdsMap map[string]func() error
 func Run() error {
 	appCmd := kingpin.New("p2p",
 		"p2p is a experimental toolbox of libp2p.")
-	appApiPort := appCmd.Flag("api", "The port used to handle api.").Default(defaultApiPort).Int()
+//	appApiPort := appCmd.Flag("api", "The port used to handle api.").Default(defaultApiPort).Int()
 
 	cmds := make(cmdsMap)
 
+	// ======== init
 	initCmd := appCmd.Command("init", "Initialize the repository.")
 	initRepoPath := initCmd.Arg("repo", "The path of repository.\n" +
 		"The current path would be used as repository if not specified.\n").String()
@@ -44,8 +55,8 @@ func Run() error {
 		return repo.Write(repoPath, config)
 	}
 
+	// ======== start
 	startCmd := appCmd.Command("start", "Start the playground node.")
-	startPort := startCmd.Arg("port", "Specified the port running playground.").Required().Int()
 	startRepoPath := startCmd.Arg("repo", "The path of repository.\n" +
 		"The current path would be used as repository if not specified.").String()
 	cmds[startCmd.FullCommand()] = func () error {
@@ -64,40 +75,24 @@ func Run() error {
 			fmt.Println("Error when read config: ", err)
 			return err
 		}
-		cfg.Port = *startPort
-/*
+
 		node, err := host.NewNode(context.Background(), cfg)
 		if err != nil {
-			fmt.Println("Error when create node: ", err)
+			fmt.Println("Error when create host node: ", err)
 			return err
 		}
-		a = &api.Api{
-			Node: node,
-			Port: *appApiPort,
-		}
-		http.Handle("/", a)
-		err = http.ListenAndServe(fmt.Sprintf(":%d", a.Port), nil)
-		if err != nil {
-			fmt.Printf("Failed to start api server: %v\n", err)
-		}
-*/
-		//node := new(host.Node)
-		host.Start(*startPort)
-
+		r := api.InitRouter(node)
+		r.Run(api.ApiPort)
 		return nil
 	}
 
-	exprCmd := appCmd.Command("expr", "Doing experiment.")
-	exprStreamCmd := exprCmd.Command("stream", "Transport through stream.")
-	cmds[exprStreamCmd.FullCommand()] = func() error {
-		return api.SendRequest("expr", map[string]string{"a": "a1"}, *appApiPort)
-	}
-
-	exprChatCmd := exprCmd.Command("chat", "Chat through mdns")
-	exprChatPort := exprChatCmd.Arg("port", "Port for host.").Default("4001").Int()
-	cmds[exprChatCmd.FullCommand()] = func() error {
-		host.ChatMDNS(*exprChatPort)
-		return nil
+	// ======== peer
+	peerCmd := appCmd.Command("peer", "libp2p peer related command")
+	peerInfoCmd := peerCmd.Command("info", "Get the info of host peer.")
+	peerInfoCopy := peerCmd.Flag("copy", "Whether copy to clipboard.").Short('c').Bool()
+	peerInfoOut := peerCmd.Arg("outFile", "The path of output file.").String()
+	cmds[peerInfoCmd.FullCommand()] = func() error {
+		return peerInfo(*peerInfoCopy, *peerInfoOut)
 	}
 
 	cmd := kingpin.MustParse(appCmd.Parse(os.Args[1:]))

@@ -11,7 +11,6 @@ import (
 )
 
 const defaultPort = 40101
-const defaultApiPort = 40102
 
 type Config struct {
 	Pubkey []byte
@@ -42,7 +41,6 @@ func InitConfig() (*Config, error) {
 		PrivKey:privK_m,
 		Pubkey:pubK_m,
 		Port:defaultPort,
-		ApiPort:defaultApiPort,
 	}, nil
 }
 
