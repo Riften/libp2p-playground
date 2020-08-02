@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/Riften/libp2p-playground/repo"
+	"github.com/Riften/libp2p-playground/service"
 	"github.com/libp2p/go-libp2p"
 	crypto "github.com/libp2p/go-libp2p-core/crypto"
 	p2phost "github.com/libp2p/go-libp2p-core/host"
@@ -17,6 +18,7 @@ const defaultConnTimeout = time.Second * 10
 type Node struct {
 	host p2phost.Host
 	cfg *repo.Config
+	speed *service.SpeedService
 	ctx context.Context
 }
 
@@ -37,7 +39,16 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 		libp2p.Identity(privK),
 	)
 	fmt.Printf("Host start at multiaddress: /ip4/0.0.0.0/tcp/%d/p2p/%s\n", cfg.Port, h.ID().Pretty())
-	return &Node{host: h, cfg: cfg, ctx: ctx}, nil
+
+	// Start services
+	speedService := service.NewSpeedService(h, context.Background())
+	speedService.Start()
+
+	return &Node{host: h, cfg: cfg, speed: speedService, ctx: ctx}, nil
+}
+
+func (n *Node) Host() (p2phost.Host) {
+	return n.host
 }
 
 func (n *Node) IsConnect(pid peer.ID) bool {

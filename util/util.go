@@ -21,7 +21,7 @@ func PeerJsonIndent(info *peer.AddrInfo, prefix string, indent string) ([]byte, 
 func BuildPeerInfo(id string, addr []string) (*peer.AddrInfo, error) {
 	pid, err := peer.Decode(id)
 	if err != nil {
-		fmt.Println("Error when decode peer id: ", err)
+		fmt.Println("Error when decode peer id " + id +": ", err)
 		return nil, err
 	}
 	mAddrs := make([]ma.Multiaddr, 0)

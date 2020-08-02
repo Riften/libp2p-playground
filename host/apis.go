@@ -40,8 +40,16 @@ func (n *Node) ApiPeerInfo(ctx *gin.Context) {
 
 func (n *Node) ApiPeerConnect(ctx *gin.Context) {
 	fmt.Println("API: ApiPeerConnect")
+	peerId, ok1 := ctx.GetPostForm("id")
+	peerAddr, ok2 := ctx.GetPostForm("addr")
+	if !(ok1 && ok2) {
+		fmt.Println("Not enough param.")
+		ctx.Writer.Write([]byte("Not enough param"))
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
 
-	info, err := util.BuildPeerInfo(ctx.Param("id"), []string{ctx.Param("addr")})
+	info, err := util.BuildPeerInfo(peerId, []string{peerAddr})
 	if err != nil {
 		ctx.Writer.Write([]byte("Fail to build peer info: " + err.Error()))
 		ctx.Status(http.StatusBadGateway)
@@ -58,5 +66,37 @@ func (n *Node) ApiPeerConnect(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Write([]byte("Connect successfully."))
+	ctx.Status(http.StatusOK)
+}
+
+func (n *Node) ApiPeerList(ctx *gin.Context) {
+	fmt.Println("API: ApiPeerList")
+
+	peers := n.Peers()
+	res := make([]string, 0)
+	for _, p := range peers {
+		res = append(res, p.Pretty())
+	}
+	responseJson(ctx, res)
+}
+
+func (n *Node) ApiSpeedSend(ctx *gin.Context) {
+	fmt.Println("API: ApiSpeedSend")
+
+	peerId, ok := ctx.GetPostForm("peer")
+	if !ok {
+		fmt.Println("Not enough param.")
+		ctx.Writer.Write([]byte("Not enough param"))
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	err := n.speed.StartSend(peerId)
+	if err != nil {
+		fmt.Println("Error when start send task: ", err)
+		ctx.Writer.Write([]byte("Error when start send task: " +  err.Error()))
+		ctx.Status(http.StatusBadGateway)
+		return
+	}
+	ctx.Writer.Write([]byte("Sending start."))
 	ctx.Status(http.StatusOK)
 }

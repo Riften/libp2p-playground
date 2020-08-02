@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/Riften/libp2p-playground/api"
 	"github.com/atotto/clipboard"
-	"github.com/libp2p/go-libp2p-core/peer"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -31,6 +30,20 @@ func peerInfo(copy bool, out string) error {
 	return nil
 }
 
+func peerList(copy bool) error {
+	res, err := api.Request(http.MethodGet, "/peer/list", nil)
+	if err != nil {
+		fmt.Println("Error when send request to http: ", err)
+		return err
+	}
+	fmt.Println(string(res))
+	if copy {
+		clipboard.WriteAll(string(res))
+		fmt.Println("Peer info has been written to clipboard.")
+	}
+	return nil
+}
+
 func peerConnect(peerId string, addr string) error {
 	params := map[string]string {
 		"id": peerId,
@@ -41,6 +54,6 @@ func peerConnect(peerId string, addr string) error {
 		fmt.Println("Error when send request to http: ", err)
 		return err
 	}
-	fmt.Println(res)
+	fmt.Println(string(res))
 	return nil
 }

@@ -26,6 +26,7 @@ type cmdsMap map[string]func() error
 func Run() error {
 	appCmd := kingpin.New("p2p",
 		"p2p is a experimental toolbox of libp2p.")
+//	appCopy := appCmd.Flag("copy", "Whether copy to clipboard.").Short('c').Bool()
 //	appApiPort := appCmd.Flag("api", "The port used to handle api.").Default(defaultApiPort).Int()
 
 	cmds := make(cmdsMap)
@@ -81,6 +82,7 @@ func Run() error {
 			fmt.Println("Error when create host node: ", err)
 			return err
 		}
+
 		r := api.InitRouter(node)
 		r.Run(api.ApiPort)
 		return nil
@@ -88,11 +90,33 @@ func Run() error {
 
 	// ======== peer
 	peerCmd := appCmd.Command("peer", "libp2p peer related command")
+	peerCopy := peerCmd.Flag("copy", "Whether copy to clipboard.").Short('c').Bool()
 	peerInfoCmd := peerCmd.Command("info", "Get the info of host peer.")
-	peerInfoCopy := peerCmd.Flag("copy", "Whether copy to clipboard.").Short('c').Bool()
-	peerInfoOut := peerCmd.Arg("outFile", "The path of output file.").String()
+	//peerInfoCopy := peerCmd.Flag("copy", "Whether copy to clipboard.").Short('c').Bool()
+	peerInfoOut := peerInfoCmd.Arg("outFile", "The path of output file.").String()
 	cmds[peerInfoCmd.FullCommand()] = func() error {
-		return peerInfo(*peerInfoCopy, *peerInfoOut)
+		return peerInfo(*peerCopy, *peerInfoOut)
+	}
+
+	peerListCmd := peerCmd.Command("list", "List all the connected peers.")
+	//peerListCopy := peerCmd.Flag("copy", "Whether copy to clipboard.").Short('c').Bool()
+	cmds[peerListCmd.FullCommand()] = func() error {
+		return peerList(*peerCopy)
+	}
+
+	peerConnectCmd := peerCmd.Command("connect", "Connect with another peer.")
+	peerConnectId := peerConnectCmd.Arg("id", "peer id.").Required().String()
+	peerConnectAddr := peerConnectCmd.Arg("address", "peer address").Required().String()
+	cmds[peerConnectCmd.FullCommand()] = func() error {
+		return peerConnect(*peerConnectId, *peerConnectAddr)
+	}
+
+	// ======== speed
+	speedCmd := appCmd.Command("speed", "Speed test related commands.")
+	speedSendCmd := speedCmd.Command("send", "Start send task to remote peer.")
+	speedSendPeer := speedSendCmd.Arg("peer", "Remote peer.").Required().String()
+	cmds[speedSendCmd.FullCommand()] = func () error {
+		return speedSend(*speedSendPeer)
 	}
 
 	cmd := kingpin.MustParse(appCmd.Parse(os.Args[1:]))
