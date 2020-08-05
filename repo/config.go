@@ -17,9 +17,10 @@ type Config struct {
 	PrivKey []byte
 	Port int
 	ApiPort int
+	Transport string
 }
 
-func InitConfig() (*Config, error) {
+func InitConfig(transport string) (*Config, error) {
 	r:= rand.Reader
 	privK, pubK, err := crypto.GenerateKeyPairWithReader(crypto.Ed25519, 2048, r)
 	//privK, pubK, err :=
@@ -41,6 +42,7 @@ func InitConfig() (*Config, error) {
 		PrivKey:privK_m,
 		Pubkey:pubK_m,
 		Port:defaultPort,
+		Transport: transport,
 	}, nil
 }
 

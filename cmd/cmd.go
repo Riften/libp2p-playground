@@ -35,9 +35,11 @@ func Run() error {
 	initCmd := appCmd.Command("init", "Initialize the repository.")
 	initRepoPath := initCmd.Arg("repo", "The path of repository.\n" +
 		"The current path would be used as repository if not specified.\n").String()
+	initTransport := initCmd.Flag("transport", "The transport protocol").Default("tcp").Short('t').String()
 
 	cmds[initCmd.FullCommand()] = func() error {
 		repoPath := *initRepoPath
+
 		if repoPath == "" {
 			fmt.Println("No repoPath specified. Used current directory as repo.")
 			pwd, err := os.Getwd()
@@ -48,11 +50,12 @@ func Run() error {
 			repoPath = pwd
 		}
 
-		config, err := repo.InitConfig()
+		config, err := repo.InitConfig(*initTransport)
 		if err != nil {
 			fmt.Println("Error when init config: ", err)
 			return err
 		}
+
 		return repo.Write(repoPath, config)
 	}
 

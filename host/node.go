@@ -9,7 +9,10 @@ import (
 	crypto "github.com/libp2p/go-libp2p-core/crypto"
 	p2phost "github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/peer"
+	libp2pquic "github.com/libp2p/go-libp2p-quic-transport"
+	"github.com/libp2p/go-tcp-transport"
 	"github.com/multiformats/go-multiaddr"
+	"log"
 	"time"
 )
 
@@ -33,10 +36,24 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 		fmt.Println("Error when unmarshal privKey: ", err)
 		return nil, err
 	}
+	var transport libp2p.Option
+	switch cfg.Transport {
+	case "tcp":
+		log.Println("Use TCP Transport")
+		transport = libp2p.Transport(tcp.NewTCPTransport)
+	case "scp":
+		log.Println("Use SCP Transport")
+		transport = libp2p.Transport(libp2pquic.NewTransport)
+	default:
+		log.Println("Transport not specified. Use TCP by default")
+		transport = libp2p.Transport(tcp.NewTCPTransport)
+	}
 	h, err := libp2p.New(
 		ctx,
 		libp2p.ListenAddrs(sourceMultiAddr),
 		libp2p.Identity(privK),
+		//libp2p.Transport()
+		transport,
 	)
 	fmt.Printf("Host start at multiaddress: /ip4/0.0.0.0/tcp/%d/p2p/%s\n", cfg.Port, h.ID().Pretty())
 
