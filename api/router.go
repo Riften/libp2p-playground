@@ -10,12 +10,16 @@ func InitRouter(n *host.Node) *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(outPutInfo)
 	apiPeer := r.Group("/peer")
-	apiPeer.GET("/info", n.ApiPeerInfo)
-	apiPeer.POST("/connect", n.ApiPeerConnect)
-	apiPeer.GET("/list", n.ApiPeerList)
+	{
 
+		apiPeer.GET("/info", n.ApiPeerInfo)
+		apiPeer.POST("/connect", n.ApiPeerConnect)
+		apiPeer.GET("/list", n.ApiPeerList)
+	}
 	apiSpeed := r.Group("/speed")
-	apiSpeed.POST("/send", n.ApiSpeedSend)
+	{
+		apiSpeed.POST("/send", n.ApiSpeedSend)
+	}
 	return r
 }
 

@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/Riften/libp2p-playground/api"
+	"github.com/Riften/libp2p-playground/global"
 	"github.com/Riften/libp2p-playground/host"
 	"github.com/Riften/libp2p-playground/repo"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io"
+	"log"
 	"os"
 )
 
@@ -121,6 +123,51 @@ func Run() error {
 	cmds[speedSendCmd.FullCommand()] = func () error {
 		return speedSend(*speedSendPeer)
 	}
+
+	// ======== ipfs
+	ipfsCmd := appCmd.Command("ipfs", "Ipfs related commands.")
+	ipfsInitCmd := ipfsCmd.Command("init", "Init ipfs peer.")
+	ipfsInitRepo := ipfsInitCmd.Arg("repo", "Repo path.").String()
+	cmds[ipfsInitCmd.FullCommand()] = func () error {
+		repoPath := *ipfsInitRepo
+		if repoPath == "" {
+			fmt.Println("No repoPath specified. Used current directory as repo.")
+			pwd, err := os.Getwd()
+			if err != nil {
+				fmt.Println("Error when get pwd: ", err)
+				return err
+			}
+			repoPath = pwd
+		}
+		err := repo.InitIpfsRepo(repoPath)
+		if err != nil {
+			log.Println("Error when init ipfs repo: ", err)
+			return err
+		}
+		return nil
+	}
+
+	ipfsStartCmd := ipfsCmd.Command("start", "Start ipfs node.")
+	ipfsStartRepo := ipfsStartCmd.Arg("repo", "Repo path.").String()
+	cmds[ipfsStartCmd.FullCommand()] = func () error {
+		repoPath := *ipfsStartRepo
+		if repoPath == "" {
+			fmt.Println("No repoPath specified. Used current directory as repo.")
+			pwd, err := os.Getwd()
+			if err != nil {
+				fmt.Println("Error when get pwd: ", err)
+				return err
+			}
+			repoPath = pwd
+		}
+		var err error
+		global.Ipfs, err = host.NewIpfsNode(context.Background(), repoPath)
+		if err != nil {
+			log.Println("Error when start ipfs node: ", err)
+		}
+		return nil
+	}
+
 
 	cmd := kingpin.MustParse(appCmd.Parse(os.Args[1:]))
 	for key, value := range cmds {
