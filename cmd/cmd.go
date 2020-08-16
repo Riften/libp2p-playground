@@ -63,31 +63,50 @@ func Run() error {
 
 	// ======== start
 	startCmd := appCmd.Command("start", "Start the playground node.")
+	startLibp2p := startCmd.Flag("libp2p", "Whether to start the libp2p host.").Bool()
+	startTcp := startCmd.Flag("tcp", "Whether to start the tcp service.").Bool()
+
 	startRepoPath := startCmd.Arg("repo", "The path of repository.\n" +
 		"The current path would be used as repository if not specified.").String()
+
 	cmds[startCmd.FullCommand()] = func () error {
-		repoPath := *startRepoPath
-		if repoPath == "" {
-			fmt.Println("No repoPath specified. Used current directory as repo.")
-			pwd, err := os.Getwd()
+		node := host.EmptyNode(context.Background())
+
+		// start libp2p host
+		if *startLibp2p {
+			repoPath := *startRepoPath
+			if repoPath == "" {
+				log.Println("No repoPath specified. Used current directory as repo.")
+				pwd, err := os.Getwd()
+				if err != nil {
+					log.Println("Error when get pwd: ", err)
+					return err
+				}
+				repoPath = pwd
+			}
+			cfg, err := repo.Read(repoPath)
 			if err != nil {
-				fmt.Println("Error when get pwd: ", err)
+				log.Println("Error when read config: ", err)
 				return err
 			}
-			repoPath = pwd
-		}
-		cfg, err := repo.Read(repoPath)
-		if err != nil {
-			fmt.Println("Error when read config: ", err)
-			return err
+
+			err = node.StartLibp2p(cfg)
+			if err != nil {
+				log.Println("Error when start libp2p host: ", err)
+				return err
+			}
 		}
 
-		node, err := host.NewNode(context.Background(), cfg)
-		if err != nil {
-			fmt.Println("Error when create host node: ", err)
-			return err
+		// start tcp service
+		if *startTcp {
+			err := node.StartTcp()
+			if err != nil {
+				log.Println("Error when start tcp service: ", err)
+				return err
+			}
 		}
 
+		// start the api server
 		r := api.InitRouter(node)
 		r.Run(api.ApiPort)
 		return nil
@@ -166,6 +185,21 @@ func Run() error {
 			log.Println("Error when start ipfs node: ", err)
 		}
 		return nil
+	}
+
+	// =============== tcp
+	tcpCmd := appCmd.Command("tcp", "tcp related commands.")
+	// tcpPort := tcpCmd.Flag("port", "tcp port").Default("10000").Int()
+	tcpListenCmd := tcpCmd.Command("listen", "start listen tcp port")
+	tcpListenPort := tcpListenCmd.Arg("port", "listening port").Default("10000").Int()
+	cmds[tcpListenCmd.FullCommand()] = func () error {
+		return tcpListen(*tcpListenPort)
+	}
+	tcpSendCmd := tcpCmd.Command("send", "start sending tcp sockets")
+	tcpSendIp := tcpSendCmd.Arg("ip", "ip address of receiver").Required().String()
+	tcpSendPort := tcpSendCmd.Arg("port", "port of receiver").Default("10000").Int()
+	cmds[tcpSendCmd.FullCommand()] = func () error {
+		return tcpSend(*tcpSendIp, *tcpSendPort)
 	}
 
 

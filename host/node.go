@@ -2,6 +2,7 @@ package host
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Riften/libp2p-playground/repo"
 	"github.com/Riften/libp2p-playground/service"
@@ -22,14 +23,25 @@ import (
 const defaultConnTimeout = time.Second * 10
 
 type Node struct {
-	host p2phost.Host
-	cfg *repo.Config
-	speed *service.SpeedService
-	ipfs *core.IpfsNode
-	ctx context.Context
+	host         p2phost.Host
+	cfg          *repo.Config
+	speedService *service.SpeedService
+	tcpService   *service.TCPService
+	ipfs         *core.IpfsNode
+	ctx          context.Context
 }
 
-func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
+func EmptyNode(ctx context.Context) *Node {
+	return &Node{
+		ctx: ctx,
+	}
+}
+
+func (n *Node) StartLibp2p(cfg *repo.Config) error {
+	if n.host != nil {
+		return errors.New("libp2p host already start")
+	}
+
 	// 0.0.0.0 will listen on any interface device.
 	//sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", cfg.Port))
 
@@ -38,7 +50,7 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 	privK, err := crypto.UnmarshalPrivateKey(cfg.PrivKey)
 	if err != nil {
 		fmt.Println("Error when unmarshal privKey: ", err)
-		return nil, err
+		return err
 	}
 	var transport libp2p.Option
 	switch cfg.Transport {
@@ -53,7 +65,7 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 		transport = libp2p.Transport(tcp.NewTCPTransport)
 	}
 	h, err := libp2p.New(
-		ctx,
+		n.ctx,
 		libp2p.ListenAddrStrings(
 			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", cfg.Port),
 			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic", cfg.Port),
@@ -64,7 +76,7 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 	)
 	if err != nil {
 		log.Println("Error when create libp2p node: ", err)
-		return nil, err
+		return err
 	}
 	fmt.Println("Host start at multiaddress:")
 	for _, ma := range h.Addrs() {
@@ -74,8 +86,19 @@ func NewNode(ctx context.Context, cfg *repo.Config) (*Node, error) {
 	// Start services
 	speedService := service.NewSpeedService(h, context.Background())
 	speedService.Start()
+	n.host = h
+	n.speedService = speedService
+	return nil
+}
 
-	return &Node{host: h, cfg: cfg, speed: speedService, ctx: ctx}, nil
+func (n *Node) StartTcp() error {
+	if n.tcpService != nil {
+		return errors.New("tcp service already start")
+	}
+
+	tcpS := service.NewTCPService(n.ctx)
+	n.tcpService = tcpS
+	return nil
 }
 
 func NewIpfsNode(ctx context.Context, repoPath string) (*core.IpfsNode, error) {

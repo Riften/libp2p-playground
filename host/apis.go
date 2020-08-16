@@ -90,7 +90,7 @@ func (n *Node) ApiSpeedSend(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	err := n.speed.StartSend(peerId)
+	err := n.speedService.StartSend(peerId)
 	if err != nil {
 		fmt.Println("Error when start send task: ", err)
 		ctx.Writer.Write([]byte("Error when start send task: " +  err.Error()))
